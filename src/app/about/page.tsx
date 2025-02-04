@@ -50,14 +50,22 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 // }
 
 export default function About() {
-  const videos=[{
-    title:"kameshika",
+  const videos=[
+    
+    {
+      title:"Pro - VIBES ft Curlzin (Official Video)",
+      link:"WZrMOUFpWMk"
+        },
+    {
+    title:"Kameshika",
     link:"lz8Hgc2dh9Y"
       },
+
       {
         title:"Pro - More",
         link:"f0m9mIX_xis"
           },
+
           {
             title:"Pro - Everyday, Everywhere Acoustic (Official Audio)",
             link:"kQ5f-ktG4XI"
