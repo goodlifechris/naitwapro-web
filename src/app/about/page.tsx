@@ -53,9 +53,14 @@ export default function About() {
   const videos=[
     
     {
+      title:"PRO TALKS ABOUT MUSIC ON CHAT SPOT SWITCH TV",
+      link:"Rsq-0QKwnT8"
+        },
+    {
       title:"Pro - VIBES ft Curlzin (Official Video)",
       link:"WZrMOUFpWMk"
         },
+
     {
     title:"Kameshika",
     link:"lz8Hgc2dh9Y"
