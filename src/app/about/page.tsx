@@ -1,3 +1,4 @@
+"use client";
 import {
   Avatar,
   Button,
@@ -6,6 +7,7 @@ import {
   Heading,
   Icon,
   IconButton,
+  Row,
   SmartImage,
   Tag,
   Text,
@@ -14,48 +16,65 @@ import { baseURL } from "@/app/resources";
 import TableOfContents from "@/components/about/TableOfContents";
 import styles from "@/components/about/about.module.scss";
 import { person, about, social } from "@/app/resources/content";
+import { Carousel } from "react-responsive-carousel";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 
-export async function generateMetadata() {
-  const title = about.title;
-  const description = about.description;
-  const ogImage = `https://${baseURL}/og?title=${encodeURIComponent(title)}`;
+// export async function generateMetadata() {
+//   const title = about.title;
+//   const description = about.description;
+//   const ogImage = `https://${baseURL}/og?title=${encodeURIComponent(title)}`;
 
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      type: "website",
-      url: `https://${baseURL}/about`,
-      images: [
-        {
-          url: ogImage,
-          alt: title,
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [ogImage],
-    },
-  };
-}
+
+//   return {
+//     title,
+//     description,
+//     openGraph: {
+//       title,
+//       description,
+//       type: "website",
+//       url: `https://${baseURL}/about`,
+//       images: [
+//         {
+//           url: ogImage,
+//           alt: title,
+//         },
+//       ],
+//     },
+//     twitter: {
+//       card: "summary_large_image",
+//       title,
+//       description,
+//       images: [ogImage],
+//     },
+//   };
+// }
 
 export default function About() {
+  const videos=[{
+    title:"kameshika",
+    link:"lz8Hgc2dh9Y"
+      },
+      {
+        title:"Pro - More",
+        link:"f0m9mIX_xis"
+          },
+          {
+            title:"Pro - Everyday, Everywhere Acoustic (Official Audio)",
+            link:"kQ5f-ktG4XI"
+              },
+              {
+                title:"Pro - Dont Be Mad (Freestyle)",
+                link:"ivLFurf_ew0"
+                  }
+      
+    ];
   const structure = [
     {
       title: about.intro.title,
       display: about.intro.display,
       items: [],
     },
-    {
-      title: about.work.title,
-      display: about.work.display,
-      items: about.work.experiences.map((experience) => experience.company),
-    },
+
     {
       title: about.studies.title,
       display: about.studies.display,
@@ -83,11 +102,7 @@ export default function About() {
             image: `${baseURL}/images/${person.avatar}`,
             sameAs: social
               .filter((item) => item.link && !item.link.startsWith("mailto:")) // Filter out empty links and email links
-              .map((item) => item.link),
-            worksFor: {
-              "@type": "Organization",
-              name: about.work.experiences[0].company || "",
-            },
+              .map((item) => item.link)
           }),
         }}
       />
@@ -209,74 +224,76 @@ export default function About() {
             </Column>
           )}
 
-          {about.work.display && (
-            <>
-              <Heading as="h2" id={about.work.title} variant="display-strong-s" marginBottom="m">
-                {about.work.title}
-              </Heading>
-              <Column fillWidth gap="l" marginBottom="40">
-                {about.work.experiences.map((experience, index) => (
-                  <Column key={`${experience.company}-${experience.role}-${index}`} fillWidth>
-                    <Flex fillWidth horizontal="space-between" vertical="end" marginBottom="4">
-                      <Text id={experience.company} variant="heading-strong-l">
-                        {experience.company}
-                      </Text>
-                      <Text variant="heading-default-xs" onBackground="neutral-weak">
-                        {experience.timeframe}
-                      </Text>
-                    </Flex>
-                    <Text variant="body-default-s" onBackground="brand-weak" marginBottom="m">
-                      {experience.role}
-                    </Text>
-                    <Column as="ul" gap="16">
-                      {experience.achievements.map((achievement: JSX.Element, index: number) => (
-                        <Text
-                          as="li"
-                          variant="body-default-m"
-                          key={`${experience.company}-${index}`}
-                        >
-                          {achievement}
-                        </Text>
-                      ))}
-                    </Column>
-                    {experience.images.length > 0 && (
-                      <Flex fillWidth paddingTop="m" paddingLeft="40" wrap>
-                        {experience.images.map((image, index) => (
-                          <Flex
-                            key={index}
-                            border="neutral-medium"
-                            radius="m"
-                            //@ts-ignore
-                            minWidth={image.width}
-                            //@ts-ignore
-                            height={image.height}
-                          >
-                            <SmartImage
-                              enlarge
-                              radius="m"
-                              //@ts-ignore
-                              sizes={image.width.toString()}
-                              //@ts-ignore
-                              alt={image.alt}
-                              //@ts-ignore
-                              src={image.src}
-                            />
-                          </Flex>
-                        ))}
-                      </Flex>
-                    )}
-                  </Column>
-                ))}
-              </Column>
-            </>
-          )}
+
+
 
           {about.studies.display && (
             <>
               <Heading as="h2" id={about.studies.title} variant="display-strong-s" marginBottom="m">
                 {about.studies.title}
               </Heading>
-              <Column fillWidth gap="l" marginBottom="40">
+              <h2 className="text-xl font-bold text-center mb-4">🔥 Latest Videos 🔥</h2>
+      {/* <Carousel showThumbs={false} autoPlay infiniteLoop> */}
+        {videos.map((video,index) => (
+          <div key={index} className="relative">
+            <iframe
+              width="100%"
+              height="400"
+              src={`https://www.youtube.com/embed/${video.link}`}
+              title={video.title}
+              allowFullScreen
+              className="rounded-lg shadow-lg"
+            ></iframe>
+            <br/>
+            <Row
+    paddingY="12"
+    gap="8"
+    vertical="center"
+    textVariant="label-default-s"
+    onBackground="neutral-medium"
+  >
+
+            <h3 className="  bg-black bg-opacity-70 text-white text-sm p-10 rounded mt-5 title bg-red">
+              {video.title} 
+            </h3>
+            </Row>
+            <Row
+            paddingY="12"
+            gap="8"
+            vertical="center"
+            textVariant="label-default-s"
+            onBackground="neutral-medium"
+            className="absolute inset-0 flex justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          >
+            <h3 className="bg-black bg-opacity-70 text-white text-xl font-semibold p-4 rounded-lg transition-all duration-300 transform group-hover:translate-y-2">
+              {video.title}
+            </h3>
+          </Row>
+          </div>
+        ))}
+      {/* </Carousel> */}
+
+      {/* <Carousel showThumbs={false} autoPlay infiniteLoop> */}
+        {/* {videos.map((link, index) => {
+          return (
+            link && (
+              <div key={index} className="relative"> */}
+                {/* Thumbnail Image */}
+                {/* <img
+                  src={`https://img.youtube.com/vi/${link.link}/hqdefault.jpg`} // YouTube thumbnail URL
+                  alt={`YouTube Video ${index + 1}`}
+                  className="rounded-lg shadow-lg cursor-pointer"
+                  onClick={() => window.open(`https://www.youtube.com/watch?v=${link.link}`, "_blank")}
+                />
+                <p className="absolute bottom-2 left-2 bg-black bg-opacity-70 text-white text-sm px-2 py-1 rounded">
+                  Click to Watch 🎥
+                </p>
+              </div>
+            )
+          );
+        })} */}
+
+              {/* <Column fillWidth gap="l" marginBottom="40">
                 {about.studies.institutions.map((institution, index) => (
                   <Column key={`${institution.name}-${index}`} fillWidth gap="4">
                     <Text id={institution.name} variant="heading-strong-l">
@@ -287,7 +304,7 @@ export default function About() {
                     </Text>
                   </Column>
                 ))}
-              </Column>
+              </Column> */}
             </>
           )}
 
