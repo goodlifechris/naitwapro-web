@@ -8,7 +8,7 @@ const person = {
   },
   role: "Musician Super Mc",
   avatar: "/images/1.jpg",
-  location: "Europe/Vienna", // Expecting the IANA time zone identifier, e.g., 'Europe/Vienna'
+  location: "America/Denver", // Expecting the IANA time zone identifier, e.g., 'Europe/Vienna'
   languages: ["English", "Kiswahili"], // optional: Leave the array empty if you don't want to display languages
 };
 
@@ -35,6 +35,11 @@ const social = [
     name: "Instagram",
     icon: "instagram",
     link: "https://www.instagram.com/naitwapro",
+  },
+  {
+    name: "Youtube",
+    icon: "youtube",
+    link: "https://www.youtube.com/channel/UCWxJUu0Q-wgHT5LTUIpgZaA",
   },
   {
     name: "Tiktok",
