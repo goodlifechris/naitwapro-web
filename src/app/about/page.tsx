@@ -52,6 +52,10 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 export default function About() {
   const videos=[
     
+        {
+      title:"Pro ‪@naitwapro‬ x Kristoff ‪@KristoffMWB‬ feat Bwanangoma - Tukadunde (official music video)",
+      link:"MQfczJpXwtU"
+        },
     {
       title:"PRO TALKS ABOUT MUSIC ON CHAT SPOT SWITCH TV",
       link:"Rsq-0QKwnT8"
