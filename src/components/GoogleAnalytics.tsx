@@ -15,7 +15,6 @@ const GoogleAnalytics = ({
   useEffect(() => {
     pageview(GA_MEASUREMENT_ID, pathname? pathname : '/')
   }, [pathname, GA_MEASUREMENT_ID])
-
   return (
     <>
       <Script
