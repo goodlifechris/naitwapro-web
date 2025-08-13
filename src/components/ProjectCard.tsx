@@ -47,20 +47,17 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 /> */}
 
 {/* // Glowing flip transition */}
-<Carousel 
-      aspectRatio="9/ 12"
- images={images.map((image) => ({
-          src: image,
-          width: "100px",
-          height: 100,
-          alt: title,
-        }))}
-  transitionEffect="flip" 
-  transitionDuration={1.2}
-    indicator="thumbnail"
+<Carousel
   autoPlay
+  interval={4000}
+  transitionEffect="slide"
+  
+  images={[
+    { src: "/images/1.jpeg", alt: "Global Vibes, African Roots" },
+    { src: "/images/2.jpeg", alt: "Beats That Move You" },
+    { src: "/images/3.jpeg", alt: "Rhythm Meets Soul" }
+  ]}
 />
-
 {/* // Parallax with thumbnails */}
 {/* <Carousel 
   images={images.map((image) => ({
