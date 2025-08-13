@@ -2,18 +2,25 @@
 
 import { Flex, RevealFx, Scroller, SmartImage } from "@/once-ui/components";
 import { useEffect, useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Image {
   src: string;
   alt: string;
 }
 
+type TransitionEffect = "slide" | "fade" | "flip" | "glow" | "parallax" | "zoom";
+
 interface CarouselProps extends React.ComponentProps<typeof Flex> {
   images: Image[];
-  indicator?: "line" | "thumbnail";
+  indicator?: "line" | "thumbnail" | "none";
   aspectRatio?: string;
   sizes?: string;
   revealedByDefault?: boolean;
+  autoPlay?: boolean;
+  interval?: number;
+  transitionEffect?: TransitionEffect;
+  transitionDuration?: number;
 }
 
 const Carousel: React.FC<CarouselProps> = ({
@@ -22,55 +29,143 @@ const Carousel: React.FC<CarouselProps> = ({
   aspectRatio = "12 / 9",
   sizes,
   revealedByDefault = false,
+  autoPlay = false,
+  interval = 5000,
+  transitionEffect = "slide",
+  transitionDuration = 0.8,
   ...rest
 }) => {
-  const [activeIndex, setActiveIndex] = useState<number>(0);
+  const [[activeIndex, direction], setActiveIndex] = useState([0, 0]);
   const [isTransitioning, setIsTransitioning] = useState(revealedByDefault);
   const [initialTransition, setInitialTransition] = useState(revealedByDefault);
-  const nextImageRef = useRef<HTMLImageElement | null>(null);
-  const transitionTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const autoPlayRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
-  const preloadNextImage = (nextIndex: number) => {
-    if (nextIndex >= 0 && nextIndex < images.length) {
-      nextImageRef.current = new Image();
-      nextImageRef.current.src = images[nextIndex].src;
+  const goToNext = () => {
+    if (images.length <= 1) return;
+    setActiveIndex([(activeIndex + 1) % images.length, 1]);
+  };
+
+  const goToPrev = () => {
+    if (images.length <= 1) return;
+    setActiveIndex([(activeIndex - 1 + images.length) % images.length, -1]);
+  };
+
+  const handleControlClick = (index: number) => {
+    if (index !== activeIndex) {
+      setActiveIndex([index, index > activeIndex ? 1 : -1]);
     }
   };
 
-  const handleImageClick = () => {
-    if (images.length > 1) {
-      const nextIndex = (activeIndex + 1) % images.length;
-      handleControlClick(nextIndex);
+  const getTransitionVariant = () => {
+    const baseTransition = {
+      duration: transitionDuration,
+      ease: [0.32, 0.72, 0, 1]
+    };
+
+    switch (transitionEffect) {
+      case "slide":
+        return {
+          enter: { x: direction > 0 ? "100%" : "-100%", opacity: 0 },
+          center: { x: "0%", opacity: 1 },
+          exit: { x: direction > 0 ? "-50%" : "50%", opacity: 0 }
+        };
+      case "fade":
+        return {
+          enter: { opacity: 0 },
+          center: { opacity: 1 },
+          exit: { opacity: 0 }
+        };
+      case "flip":
+        return {
+          enter: { 
+            rotateY: direction > 0 ? 90 : -90,
+            opacity: 0,
+            scale: 0.8
+          },
+          center: { 
+            rotateY: 0,
+            opacity: 1,
+            scale: 1
+          },
+          exit: { 
+            rotateY: direction > 0 ? -90 : 90,
+            opacity: 0,
+            scale: 0.8
+          }
+        };
+      case "glow":
+        return {
+          enter: { 
+            opacity: 0,
+            filter: "blur(8px) brightness(2)"
+          },
+          center: { 
+            opacity: 1,
+            filter: "blur(0px) brightness(1)"
+          },
+          exit: { 
+            opacity: 0,
+            filter: "blur(8px) brightness(2)"
+          }
+        };
+      case "parallax":
+        return {
+          enter: { 
+            x: direction > 0 ? "50%" : "-50%",
+            opacity: 0,
+            scale: 0.9
+          },
+          center: { 
+            x: "0%",
+            opacity: 1,
+            scale: 1
+          },
+          exit: { 
+            x: direction > 0 ? "-30%" : "30%",
+            opacity: 0,
+            scale: 0.9
+          }
+        };
+      case "zoom":
+        return {
+          enter: { 
+            scale: 0.7,
+            opacity: 0
+          },
+          center: { 
+            scale: 1,
+            opacity: 1
+          },
+          exit: { 
+            scale: 1.3,
+            opacity: 0
+          }
+        };
+      default:
+        return {
+          enter: { x: direction > 0 ? "100%" : "-100%", opacity: 0 },
+          center: { x: "0%", opacity: 1 },
+          exit: { x: direction > 0 ? "-50%" : "50%", opacity: 0 }
+        };
     }
   };
 
-  const handleControlClick = (nextIndex: number) => {
-    if (nextIndex !== activeIndex && !transitionTimeoutRef.current) {
-      preloadNextImage(nextIndex);
-
-      setIsTransitioning(false);
-
-      transitionTimeoutRef.current = setTimeout(() => {
-        setActiveIndex(nextIndex);
-
-        setTimeout(() => {
-          setIsTransitioning(true);
-          transitionTimeoutRef.current = undefined;
-        }, 300);
-      }, 800);
+  useEffect(() => {
+    if (autoPlay && images.length > 1) {
+      autoPlayRef.current = setInterval(goToNext, interval);
+      return () => {
+        if (autoPlayRef.current) {
+          clearInterval(autoPlayRef.current);
+        }
+      };
     }
-  };
+  }, [activeIndex, autoPlay, interval, images.length]);
 
   useEffect(() => {
     if (!revealedByDefault && !initialTransition) {
       setIsTransitioning(true);
       setInitialTransition(true);
     }
-    return () => {
-      if (transitionTimeoutRef.current) {
-        clearTimeout(transitionTimeoutRef.current);
-      }
-    };
   }, [revealedByDefault, initialTransition]);
 
   if (images.length === 0) {
@@ -79,76 +174,138 @@ const Carousel: React.FC<CarouselProps> = ({
 
   return (
     <Flex fillWidth gap="12" direction="column" {...rest}>
-      <RevealFx
-        onClick={handleImageClick}
-        fillWidth
-        trigger={isTransitioning}
-        translateY="16"
-        aspectRatio={aspectRatio}
-        speed="fast"
+      <div 
+        style={{
+          position: 'relative',
+          width: '100%',
+          aspectRatio: aspectRatio,
+          overflow: 'hidden',
+          borderRadius: 'var(--radius-l)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+        }}
+        onClick={goToNext}
       >
-        <SmartImage
-          sizes={sizes}
-          priority
-          radius="l"
-          border="neutral-alpha-weak"
-          alt={images[activeIndex]?.alt}
-          aspectRatio={aspectRatio}
-          src={images[activeIndex]?.src}
-          style={{
-            
-            ...(images.length > 1 && {
-              cursor: "pointer",
-            }),
-          }}
-        />
-      </RevealFx>
-      {images.length > 1 && (
+        <AnimatePresence custom={direction} initial={false}>
+          <motion.div
+            key={activeIndex}
+            custom={direction}
+            variants={getTransitionVariant()}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{
+              duration: transitionDuration,
+              ease: [0.32, 0.72, 0, 1]
+            }}
+            style={{
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}
+          >
+            <div style={{
+              position: 'relative',
+              width: '100%',
+              height: '100%',
+              borderRadius: 'var(--radius-l)',
+              overflow: 'hidden',
+            }}>
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                backdropFilter: 'blur(16px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                borderRadius: 'var(--radius-l)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                zIndex: 1,
+              }} />
+              <SmartImage
+                sizes={sizes}
+                priority
+                radius="l"
+                alt={images[activeIndex]?.alt}
+                aspectRatio={aspectRatio}
+                src={images[activeIndex]?.src}
+                style={{
+                  position: 'relative',
+                  zIndex: 2,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  cursor: images.length > 1 ? 'pointer' : 'default'
+                }}
+              />
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+      
+      {images.length > 1 && indicator !== "none" && (
         <>
           {indicator === "line" ? (
             <Flex gap="4" paddingX="s" fillWidth horizontal="center">
               {images.map((_, index) => (
-                <Flex
+                <motion.div
                   key={index}
                   onClick={() => handleControlClick(index)}
                   style={{
-                    background:
-                      activeIndex === index
-                        ? "var(--neutral-on-background-strong)"
-                        : "var(--neutral-alpha-medium)",
-                    transition: "background 0.3s ease",
+                    background: activeIndex === index
+                      ? "var(--neutral-on-background-strong)"
+                      : "var(--neutral-alpha-medium)",
+                    borderRadius: '4px',
+                    cursor: 'pointer'
                   }}
-                  cursor="interactive"
-                  fillWidth
-                  height="2"
-                ></Flex>
+                  initial={{ scaleX: 0.5 }}
+                  animate={{ 
+                    scaleX: activeIndex === index ? 1.5 : 1,
+                    opacity: activeIndex === index ? 1 : 0.6
+                  }}
+                  transition={{ type: 'spring', stiffness: 300 }}
+                  className="indicator-line"
+                />
               ))}
             </Flex>
           ) : (
             <Scroller fillWidth gap="4" onItemClick={handleControlClick}>
               {images.map((image, index) => (
-                <Flex
+                <motion.div
                   key={index}
+                  onClick={() => handleControlClick(index)}
                   style={{
-                    border: activeIndex === index ? "2px solid var(--brand-solid-strong)" : "none",
+                    border: activeIndex === index 
+                      ? "2px solid var(--brand-solid-strong)" 
+                      : "2px solid transparent",
                     borderRadius: "var(--radius-m-nest-4)",
-                    transition: "border 0.3s ease",
+                    backdropFilter: 'blur(8px)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    cursor: 'pointer',
+                    overflow: 'hidden'
                   }}
-                  cursor="interactive"
-                  padding="4"
-                  width="80"
-                  height="80"
+                  initial={{ scale: 0.9 }}
+                  animate={{ 
+                    scale: activeIndex === index ? 1.05 : 1,
+                    borderColor: activeIndex === index 
+                      ? "var(--brand-solid-strong)" 
+                      : "rgba(255, 255, 255, 0.2)"
+                  }}
+                  transition={{ type: 'spring', stiffness: 400 }}
                 >
                   <SmartImage
                     alt={image.alt}
                     aspectRatio="1 / 1"
                     sizes="120px"
                     src={image.src}
-                    cursor="interactive"
                     radius="m"
-                    transition="macro-medium"
+                    style={{
+                      transform: activeIndex === index ? 'scale(1.05)' : 'scale(1)',
+                      transition: 'transform 0.3s ease'
+                    }}
                   />
-                </Flex>
+                </motion.div>
               ))}
             </Scroller>
           )}
