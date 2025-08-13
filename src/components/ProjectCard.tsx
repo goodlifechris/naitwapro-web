@@ -33,8 +33,11 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   return (
     <Column fillWidth gap="m">
       <Carousel
+      sizes="1000vw"
+      aspectRatio="9 / 12"
         images={images.map((image) => ({
           src: image,
+
           alt: title,
         }))}
       />

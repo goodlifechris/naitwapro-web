@@ -12,7 +12,7 @@ import Particles from "@/components/particle";
 export async function generateMetadata() {
   const title = home.title;
   const description = home.description;
-  const ogImage = `/images/1.jpg`;
+  const ogImage = `/images/1.png`;
 
   return {
     title,

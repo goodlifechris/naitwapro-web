@@ -7,7 +7,7 @@ const person = {
     return `${this.firstName} ${this.lastName}`;
   },
   role: "Musician Super Mc",
-  avatar: "/images/1.jpg",
+  avatar: "/images/11.jpg",
   location: "America/Denver", // Expecting the IANA time zone identifier, e.g., 'Europe/Vienna'
   languages: ["English", "Kiswahili"], // optional: Leave the array empty if you don't want to display languages
 };
