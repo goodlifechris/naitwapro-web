@@ -224,7 +224,7 @@ const Carousel: React.FC<CarouselProps> = ({
                 <SmartImage
   priority
   alt={image.alt}
-  src={images.src}
+  src={image.src}
   style={{
     width: '100%',
     height: '800px', // Fixed height
