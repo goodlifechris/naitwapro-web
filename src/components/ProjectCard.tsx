@@ -48,6 +48,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 
 {/* // Glowing flip transition */}
 <Carousel
+  aspectRatio="9 / 12"
   autoPlay
   interval={4000}
   transitionEffect="slide"

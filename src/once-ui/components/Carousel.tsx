@@ -227,8 +227,8 @@ const Carousel: React.FC<CarouselProps> = ({
   src={image.src}
   style={{
     width: '100%',
-    height: '800px', // Fixed height
-    objectFit: 'contain'
+    height:'100vh',
+    objectFit: 'cover'
   }}
 />
                 {/* <SmartImage
